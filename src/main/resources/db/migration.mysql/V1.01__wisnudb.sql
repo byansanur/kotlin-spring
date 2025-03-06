@@ -1,0 +1,12 @@
+--CREATE DATABASE IF NOT EXISTS `gospring`;
+--
+--CREATE TABLE `users` (
+--  `id` varchar(255) NOT NULL,
+--  `name` varchar(50) NOT NULL,
+--  `user_name` varchar(25) NOT NULL,
+--  `passwords` varchar(25) NOT NULL,
+--  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--  PRIMARY KEY (`id`),
+--  UNIQUE KEY `user_name_unique` (`user_name`)
+--);
