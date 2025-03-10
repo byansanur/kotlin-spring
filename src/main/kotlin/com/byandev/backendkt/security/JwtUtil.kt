@@ -18,6 +18,9 @@ class JwtUtil {
     @Value("\${jwt.expiration}")
     private var expiration: Long = 0
 
+    @Value("\${jwt.refreshExpiration}")
+    private var refreshExpiration: Long = 0
+
     fun extractUsername(token: String): String? {
         return extractClaim(token, Claims::getSubject)
     }
@@ -31,7 +34,7 @@ class JwtUtil {
         return claimsResolver(claims!!)
     }
 
-    private fun extractAllClaims(token: String): Claims? {
+    fun extractAllClaims(token: String): Claims? {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
     }
 
@@ -42,6 +45,16 @@ class JwtUtil {
     fun generateToken(userDetails: UserDetails): String {
         val claims: Map<String, Any> = HashMap()
         return createToken(claims, userDetails.username)
+    }
+
+    fun generateRefreshToken(userDetails: UserDetails): String {
+        return Jwts
+            .builder()
+            .setSubject(userDetails.username)
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + refreshExpiration))
+            .signWith(SignatureAlgorithm.HS256, secret)
+            .compact()
     }
 
     private fun createToken(claims: Map<String, Any>, subject: String): String {

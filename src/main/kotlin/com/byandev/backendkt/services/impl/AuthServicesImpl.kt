@@ -1,8 +1,10 @@
 package com.byandev.backendkt.services.impl
 
+import com.byandev.backendkt.entity.UsersToken
 import com.byandev.backendkt.model.req.UsersLoginRequest
 import com.byandev.backendkt.model.res.UsersLoginResponse
 import com.byandev.backendkt.repository.AuthRepository
+import com.byandev.backendkt.repository.RefreshTokenRepository
 import com.byandev.backendkt.repository.URoleRepository
 import com.byandev.backendkt.security.JwtUtil
 import com.byandev.backendkt.services.AuthServices
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class AuthServicesImpl(
@@ -23,7 +26,8 @@ class AuthServicesImpl(
     val authenticationManager: AuthenticationManager,
     val userDetailsService: UserDetailsService,
     val roleRepository: URoleRepository,
-    val jwtUtil: JwtUtil
+    val jwtUtil: JwtUtil,
+    val refreshTokenRepository: RefreshTokenRepository
 ) : AuthServices {
     override fun loginByPassword(loginRequest: UsersLoginRequest): UsersLoginResponse? {
         println("login request: $loginRequest")
@@ -58,6 +62,14 @@ class AuthServicesImpl(
 
         val token = jwtUtil.generateToken(userDetails)
         println("token: $token")
+
+        refreshTokenRepository.save(
+            UsersToken(
+                id = UUID.randomUUID().toString(),
+                username = updatedUser.username,
+                token = token, refreshToken = null, createdAt = formatNowTime(), updatedAt = null, deletedAt = null
+            )
+        )
 
         return UsersLoginResponse(
             id = updatedUser.id,

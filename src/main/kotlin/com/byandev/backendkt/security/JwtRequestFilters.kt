@@ -1,5 +1,6 @@
 package com.byandev.backendkt.security
 
+import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -24,7 +25,17 @@ class JwtRequestFilters(
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7)
-            username = jwtUtil.extractUsername(jwt)
+            try {
+                username = jwtUtil.extractUsername(jwt)
+            } catch (e: ExpiredJwtException) {
+                response.status = HttpServletResponse.SC_UNAUTHORIZED
+                response.writer.write("Token Expired")
+                return // Stop further processing
+            } catch (e: Exception) {
+                // Handle other JWT exceptions (e.g., invalid signature)
+                response.status = HttpServletResponse.SC_FORBIDDEN
+                return // Stop further processing
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().authentication == null) {

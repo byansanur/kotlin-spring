@@ -32,6 +32,6 @@ fun formatNowTime(gmt: String? = "") : String  {
     val zId: ZoneId = if (gmt.isNullOrBlank())
         ZoneId.of("GMT+7")
     else ZoneId.of(gmt)
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
     return ZonedDateTime.now(zId).format(formatter)
 }
